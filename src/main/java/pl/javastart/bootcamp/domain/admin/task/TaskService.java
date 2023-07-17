@@ -1,7 +1,9 @@
 package pl.javastart.bootcamp.domain.admin.task;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import pl.javastart.bootcamp.utils.ReorderService;
+import pl.javastart.bootcamp.utils.YtLinksParser;
 
 import java.util.List;
 
@@ -9,9 +11,11 @@ import java.util.List;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final YtLinksParser ytLinksParser;
 
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, YtLinksParser ytLinksParser) {
         this.taskRepository = taskRepository;
+        this.ytLinksParser = ytLinksParser;
     }
 
     public List<Task> findAllSortedAndNotArchived() {
@@ -23,8 +27,13 @@ public class TaskService {
     }
 
     public void save(Task task) {
+        if (!StringUtils.isEmpty(task.getSolutionVideo())) {
+            List<String> newVideoLinks = ytLinksParser.parseVideoLinks(task.getSolutionVideo().split("\n"));
+            task.setSolutionVideo(String.join("\n", newVideoLinks));
+        }
         taskRepository.save(task);
     }
+
 
     public Task prepareTaskWithSortOrder() {
         Task task = new Task();

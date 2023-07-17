@@ -1,9 +1,11 @@
 package pl.javastart.bootcamp.domain.admin.template;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import pl.javastart.bootcamp.config.notfound.ResourceNotFoundException;
 import pl.javastart.bootcamp.domain.training.lesson.Lesson;
 import pl.javastart.bootcamp.domain.training.lesson.LessonRepository;
+import pl.javastart.bootcamp.utils.YtLinksParser;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -14,13 +16,15 @@ public class TrainingTemplateService {
     private final TrainingTemplateRepository trainingTemplateRepository;
     private final TrainingTemplateLessonRepository trainingTemplateLessonRepository;
     private final LessonRepository lessonRepository;
+    private final YtLinksParser ytLinksParser;
 
     public TrainingTemplateService(TrainingTemplateRepository trainingTemplateRepository,
                                    TrainingTemplateLessonRepository trainingTemplateLessonRepository,
-                                   LessonRepository lessonRepository) {
+                                   LessonRepository lessonRepository, YtLinksParser ytLinksParser) {
         this.trainingTemplateRepository = trainingTemplateRepository;
         this.trainingTemplateLessonRepository = trainingTemplateLessonRepository;
         this.lessonRepository = lessonRepository;
+        this.ytLinksParser = ytLinksParser;
     }
 
 
@@ -67,7 +71,12 @@ public class TrainingTemplateService {
         templateLesson.setNumber(dto.getNumber());
         Lesson lesson = templateLesson.getLesson();
         lesson.setTitle(dto.getTitle());
-        lesson.setVideoLinks(dto.getVideoLinks());
+        if (!StringUtils.isEmpty(dto.getVideoLinks())) {
+            List<String> newVideoLinks = ytLinksParser.parseVideoLinks(dto.getVideoLinks().split("\n"));
+            lesson.setVideoLinks(String.join("\n", newVideoLinks));
+        } else {
+            lesson.setVideoLinks(dto.getVideoLinks());
+        }
         lesson.setLessonLinks(dto.getLessonLinks());
         dto.setTitle(templateLesson.getLesson().getTitle());
     }

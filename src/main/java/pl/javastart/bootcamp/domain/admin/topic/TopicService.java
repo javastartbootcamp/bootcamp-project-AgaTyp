@@ -1,8 +1,10 @@
 package pl.javastart.bootcamp.domain.admin.topic;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import pl.javastart.bootcamp.domain.admin.task.ReorderDto;
 import pl.javastart.bootcamp.utils.ReorderService;
+import pl.javastart.bootcamp.utils.YtLinksParser;
 
 import java.util.List;
 
@@ -10,9 +12,11 @@ import java.util.List;
 public class TopicService {
 
     private TopicRepository topicRepository;
+    private final YtLinksParser ytLinksParser;
 
-    public TopicService(TopicRepository topicRepository) {
+    public TopicService(TopicRepository topicRepository, YtLinksParser ytLinksParser) {
         this.topicRepository = topicRepository;
+        this.ytLinksParser = ytLinksParser;
     }
 
     public List<Topic> findAll() {
@@ -24,6 +28,10 @@ public class TopicService {
     }
 
     public void save(Topic topic) {
+        if (!StringUtils.isEmpty(topic.getVideoLinks())) {
+            List<String> newVideoLinks = ytLinksParser.parseVideoLinks(topic.getVideoLinks().split("\n"));
+            topic.setVideoLinks(String.join("\n", newVideoLinks));
+        }
 
         topicRepository.save(topic);
     }
