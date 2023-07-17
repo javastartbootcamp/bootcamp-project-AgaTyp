@@ -119,7 +119,7 @@ public class LessonService {
     public void save(Lesson lesson) {
 
         if (!StringUtils.isEmpty(lesson.getVideoLinks())) {
-            List<String> newVideoLinks =ytLinksParser.parseVideoLinks(lesson.getVideoLinks().split("\n"));
+            List<String> newVideoLinks = ytLinksParser.parseVideoLinks(lesson.getVideoLinks().split("\n"));
             lesson.setVideoLinks(String.join("\n", newVideoLinks));
         }
         lessonRepository.save(lesson);
