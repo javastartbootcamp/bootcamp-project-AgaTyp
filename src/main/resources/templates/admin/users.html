@@ -20,6 +20,7 @@
         <tr th:each="user: ${users}" class="clickable-row" th:data-href="'/admin/uzytkownicy/' + ${user.id}">
             <td th:text="${user.firstName} + ' ' + ${user.lastName}"></td>
             <td th:text="${user.email}"></td>
+            <td><a href="#"  th:href="@{/admin/change_role(email=${user.email})}" th:text="|Zmień uprawnienia administracyjne|"></a></td>
         </tr>
 
         </tbody>

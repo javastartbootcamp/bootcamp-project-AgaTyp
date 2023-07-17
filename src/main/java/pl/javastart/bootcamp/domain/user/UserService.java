@@ -11,24 +11,31 @@ import pl.javastart.bootcamp.config.notfound.ResourceNotFoundException;
 import pl.javastart.bootcamp.domain.signup.SignupService;
 import pl.javastart.bootcamp.domain.user.role.Role;
 import pl.javastart.bootcamp.domain.user.role.UserRole;
+import pl.javastart.bootcamp.domain.user.role.UserRoleRepository;
 import pl.javastart.bootcamp.mail.MailService;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static pl.javastart.bootcamp.domain.user.ActivationResult.*;
 
 @Service
 public class UserService {
 
+    private static final String ADMIN_ROLE = "ADMIN_ROLE";
+
     private UserRepository userRepository;
+    private UserRoleRepository userRoleRepository;
     private PasswordEncoder passwordEncoder;
     private MailService mailService;
     private SignupService signupService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MailService mailService, SignupService signupService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MailService mailService, SignupService signupService,
+                       UserRoleRepository userRoleRepository) {
         this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
         this.passwordEncoder = passwordEncoder;
         this.mailService = mailService;
         this.signupService = signupService;
@@ -179,5 +186,50 @@ public class UserService {
     public void updateGithubUsername(String name, String githubUsername) {
         User user = findByEmailOrThrow(name);
         user.setGithubUsername(githubUsername);
+    }
+
+    @Transactional
+    public void changeAdminRoleUserByEmail(String email) {
+        Optional<User> user = findByEmail(email);
+        if (isAdmin(email)) {
+            user.ifPresent(u -> {
+                u.getRoles().removeIf(role -> (role.getUser().getEmail().equals("ADMIN")));
+                userRepository.save(u);
+            });
+        } else {
+//            Optional<UserRole> userRole = userRoleRepository.findByRole(Role.ROLE_ADMIN);
+            user.ifPresent(u -> {
+                UserRole userRole = new UserRole();
+                userRole.setRole(Role.ROLE_ADMIN);
+
+//                u.setRoles(Collections.singletonList(userRole));
+//                u.setRoles(List.of(u.getRoles(),userRole));
+                u.getRoles().add(userRole);
+                List<UserRole> roles = u.getRoles();
+//                System.out.println(roles);
+//                u.getRoles().add(new UserRole(u, Role.ROLE_ADMIN));
+                userRepository.save(u);
+            });
+        }
+    }
+
+    private boolean isAdmin(String email) {
+        return findAllAdminsEmails()
+                .stream()
+                .anyMatch(user -> user.equals(email));
+    }
+
+    private List<String> findAllAdminsEmails() {
+        List<User> allByRolesRole = userRepository.findAllByRoles_Role(Role.ROLE_ADMIN);
+        return allByRolesRole.stream()
+                .map(User::getEmail)
+                .collect(Collectors.toList());
+//                .stream()
+//                .map(User::getEmail)
+//                .collect(Collectors.toList());
+//        return userRepository.findAllByRoles_Role(ADMIN_ROLE)
+//                .stream()
+//                .map(User::getEmail)
+//                .collect(Collectors.toList());
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import pl.javastart.bootcamp.domain.user.User;
 import pl.javastart.bootcamp.domain.user.UserService;
 
@@ -27,6 +28,12 @@ public class AdminUserController {
         User user = userService.findByIdOrThrow(id);
         model.addAttribute("user", user);
         return "admin/user";
+    }
+
+    @GetMapping("/admin/change_role")
+    String changeUserRole(@RequestParam String email) {
+        userService.changeAdminRoleUserByEmail(email);
+        return "redirect:/admin/uzytkownicy";
     }
 
 
