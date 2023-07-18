@@ -9,7 +9,7 @@
     <div class="navbar-toggler navbar-light" data-toggle="collapse"
          aria-controls="basicExampleNav" aria-expanded="false"
          th:if="${nextTrainingId != null}">
-        <a th:href="|/szkolenie/${nextTrainingUrl}/${nextTrainingId}|">
+        <a th:href="|/szkolenie/${nextTrainingUrl}/${nextTrainingId}|" sec:authorize="${!isAuthenticated()}">
             <button class="btn btn-primary">
                 Zapisz się
             </button>
@@ -57,7 +57,7 @@
         <!-- Links -->
 
         <a th:href="|/szkolenie/${nextTrainingUrl}/${nextTrainingId}|" th:if="${nextTrainingId != null}"
-           class="d-none d-md-block">
+           class="d-none d-md-block" sec:authorize="${!isAuthenticated()}">
             <button class="btn btn-primary">
                 Zapisz się
             </button>
