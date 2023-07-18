@@ -47,7 +47,6 @@ public class LessonService {
     private final LessonExerciseRepository lessonExerciseRepository;
     private final LessonTaskRepository lessonTaskRepository;
     private final SignupService signupService;
-    private final YtLinksParser ytLinksParser;
 
     public LessonService(LessonRepository lessonRepository,
                          LessonTaskService lessonTaskService,
@@ -58,7 +57,7 @@ public class LessonService {
                          TrainingTemplateLessonRepository trainingTemplateLessonRepository,
                          LessonExerciseRepository lessonExerciseRepository,
                          LessonTaskRepository lessonTaskRepository,
-                         SignupService signupService, YtLinksParser ytLinksParser) {
+                         SignupService signupService) {
         this.lessonRepository = lessonRepository;
         this.lessonTaskService = lessonTaskService;
         this.bigDecimalFormatter = bigDecimalFormatter;
@@ -69,7 +68,6 @@ public class LessonService {
         this.lessonExerciseRepository = lessonExerciseRepository;
         this.lessonTaskRepository = lessonTaskRepository;
         this.signupService = signupService;
-        this.ytLinksParser = ytLinksParser;
     }
 
     public Lesson findByIdOrThrow(Long id) {
@@ -119,7 +117,7 @@ public class LessonService {
     public void save(Lesson lesson) {
 
         if (!StringUtils.isEmpty(lesson.getVideoLinks())) {
-            List<String> newVideoLinks = ytLinksParser.parseVideoLinks(lesson.getVideoLinks().split("\n"));
+            List<String> newVideoLinks = YtLinksParser.parseVideoLinks(lesson.getVideoLinks().split("\n"));
             lesson.setVideoLinks(String.join("\n", newVideoLinks));
         }
         lessonRepository.save(lesson);

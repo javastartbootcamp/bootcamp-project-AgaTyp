@@ -12,11 +12,9 @@ import java.util.List;
 public class TopicService {
 
     private TopicRepository topicRepository;
-    private final YtLinksParser ytLinksParser;
 
-    public TopicService(TopicRepository topicRepository, YtLinksParser ytLinksParser) {
+    public TopicService(TopicRepository topicRepository) {
         this.topicRepository = topicRepository;
-        this.ytLinksParser = ytLinksParser;
     }
 
     public List<Topic> findAll() {
@@ -29,7 +27,7 @@ public class TopicService {
 
     public void save(Topic topic) {
         if (!StringUtils.isEmpty(topic.getVideoLinks())) {
-            List<String> newVideoLinks = ytLinksParser.parseVideoLinks(topic.getVideoLinks().split("\n"));
+            List<String> newVideoLinks = YtLinksParser.parseVideoLinks(topic.getVideoLinks().split("\n"));
             topic.setVideoLinks(String.join("\n", newVideoLinks));
         }
 

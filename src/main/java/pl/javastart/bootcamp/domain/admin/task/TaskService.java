@@ -11,11 +11,9 @@ import java.util.List;
 public class TaskService {
 
     private final TaskRepository taskRepository;
-    private final YtLinksParser ytLinksParser;
 
-    public TaskService(TaskRepository taskRepository, YtLinksParser ytLinksParser) {
+    public TaskService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
-        this.ytLinksParser = ytLinksParser;
     }
 
     public List<Task> findAllSortedAndNotArchived() {
@@ -28,7 +26,7 @@ public class TaskService {
 
     public void save(Task task) {
         if (!StringUtils.isEmpty(task.getSolutionVideo())) {
-            List<String> newVideoLinks = ytLinksParser.parseVideoLinks(task.getSolutionVideo().split("\n"));
+            List<String> newVideoLinks = YtLinksParser.parseVideoLinks(task.getSolutionVideo().split("\n"));
             task.setSolutionVideo(String.join("\n", newVideoLinks));
         }
         taskRepository.save(task);

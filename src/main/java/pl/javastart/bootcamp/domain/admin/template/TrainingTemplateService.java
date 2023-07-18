@@ -16,15 +16,13 @@ public class TrainingTemplateService {
     private final TrainingTemplateRepository trainingTemplateRepository;
     private final TrainingTemplateLessonRepository trainingTemplateLessonRepository;
     private final LessonRepository lessonRepository;
-    private final YtLinksParser ytLinksParser;
 
     public TrainingTemplateService(TrainingTemplateRepository trainingTemplateRepository,
                                    TrainingTemplateLessonRepository trainingTemplateLessonRepository,
-                                   LessonRepository lessonRepository, YtLinksParser ytLinksParser) {
+                                   LessonRepository lessonRepository) {
         this.trainingTemplateRepository = trainingTemplateRepository;
         this.trainingTemplateLessonRepository = trainingTemplateLessonRepository;
         this.lessonRepository = lessonRepository;
-        this.ytLinksParser = ytLinksParser;
     }
 
 
@@ -72,7 +70,7 @@ public class TrainingTemplateService {
         Lesson lesson = templateLesson.getLesson();
         lesson.setTitle(dto.getTitle());
         if (!StringUtils.isEmpty(dto.getVideoLinks())) {
-            List<String> newVideoLinks = ytLinksParser.parseVideoLinks(dto.getVideoLinks().split("\n"));
+            List<String> newVideoLinks = YtLinksParser.parseVideoLinks(dto.getVideoLinks().split("\n"));
             lesson.setVideoLinks(String.join("\n", newVideoLinks));
         } else {
             lesson.setVideoLinks(dto.getVideoLinks());
