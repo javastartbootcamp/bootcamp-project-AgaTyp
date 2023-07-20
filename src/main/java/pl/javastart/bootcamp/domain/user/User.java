@@ -3,6 +3,7 @@ package pl.javastart.bootcamp.domain.user;
 import lombok.Getter;
 import lombok.Setter;
 import pl.javastart.bootcamp.domain.signup.Signup;
+import pl.javastart.bootcamp.domain.user.role.Role;
 import pl.javastart.bootcamp.domain.user.role.UserRole;
 
 import javax.persistence.*;
@@ -40,7 +41,7 @@ public class User {
 
     private LocalDateTime createdDate;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserRole> roles;
 
     @OneToMany(mappedBy = "user")
@@ -51,4 +52,10 @@ public class User {
     private String passwordResetKey;
 
     private String githubUsername;
+
+    public boolean isAdmin() {
+        return roles
+                .stream()
+                .anyMatch(userRole -> userRole.getRole().equals(Role.ROLE_ADMIN));
+    }
 }

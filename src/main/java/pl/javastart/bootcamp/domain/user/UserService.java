@@ -11,7 +11,6 @@ import pl.javastart.bootcamp.config.notfound.ResourceNotFoundException;
 import pl.javastart.bootcamp.domain.signup.SignupService;
 import pl.javastart.bootcamp.domain.user.role.Role;
 import pl.javastart.bootcamp.domain.user.role.UserRole;
-import pl.javastart.bootcamp.domain.user.role.UserRoleRepository;
 import pl.javastart.bootcamp.mail.MailService;
 
 import javax.transaction.Transactional;
@@ -23,19 +22,13 @@ import static pl.javastart.bootcamp.domain.user.ActivationResult.*;
 
 @Service
 public class UserService {
-
-    private static final String ADMIN_ROLE = "ADMIN_ROLE";
-
     private UserRepository userRepository;
-    private UserRoleRepository userRoleRepository;
     private PasswordEncoder passwordEncoder;
     private MailService mailService;
     private SignupService signupService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MailService mailService, SignupService signupService,
-                       UserRoleRepository userRoleRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MailService mailService, SignupService signupService) {
         this.userRepository = userRepository;
-        this.userRoleRepository = userRoleRepository;
         this.passwordEncoder = passwordEncoder;
         this.mailService = mailService;
         this.signupService = signupService;
@@ -193,21 +186,15 @@ public class UserService {
         Optional<User> user = findByEmail(email);
         if (isAdmin(email)) {
             user.ifPresent(u -> {
-                u.getRoles().removeIf(role -> (role.getUser().getEmail().equals("ADMIN")));
+                u.getRoles().removeIf(role -> (role.getRole().equals(Role.ROLE_ADMIN)));
                 userRepository.save(u);
             });
         } else {
-//            Optional<UserRole> userRole = userRoleRepository.findByRole(Role.ROLE_ADMIN);
             user.ifPresent(u -> {
                 UserRole userRole = new UserRole();
                 userRole.setRole(Role.ROLE_ADMIN);
-
-//                u.setRoles(Collections.singletonList(userRole));
-//                u.setRoles(List.of(u.getRoles(),userRole));
+                userRole.setUser(u);
                 u.getRoles().add(userRole);
-                List<UserRole> roles = u.getRoles();
-//                System.out.println(roles);
-//                u.getRoles().add(new UserRole(u, Role.ROLE_ADMIN));
                 userRepository.save(u);
             });
         }
@@ -224,12 +211,5 @@ public class UserService {
         return allByRolesRole.stream()
                 .map(User::getEmail)
                 .collect(Collectors.toList());
-//                .stream()
-//                .map(User::getEmail)
-//                .collect(Collectors.toList());
-//        return userRepository.findAllByRoles_Role(ADMIN_ROLE)
-//                .stream()
-//                .map(User::getEmail)
-//                .collect(Collectors.toList());
     }
 }
