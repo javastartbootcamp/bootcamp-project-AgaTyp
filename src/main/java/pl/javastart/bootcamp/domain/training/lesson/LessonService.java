@@ -23,6 +23,7 @@ import pl.javastart.bootcamp.domain.user.User;
 import pl.javastart.bootcamp.domain.user.training.lesson.LessonWithPointsDto;
 import pl.javastart.bootcamp.domain.user.training.lesson.task.usersolution.UserTask;
 import pl.javastart.bootcamp.utils.BigDecimalFormatter;
+import pl.javastart.bootcamp.utils.YtLinksParser;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -114,6 +115,11 @@ public class LessonService {
     }
 
     public void save(Lesson lesson) {
+
+        if (!StringUtils.isEmpty(lesson.getVideoLinks())) {
+            List<String> newVideoLinks = YtLinksParser.parseVideoLinks(lesson.getVideoLinks().split("\n"));
+            lesson.setVideoLinks(String.join("\n", newVideoLinks));
+        }
         lessonRepository.save(lesson);
     }
 

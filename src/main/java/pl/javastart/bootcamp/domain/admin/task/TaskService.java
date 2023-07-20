@@ -1,7 +1,9 @@
 package pl.javastart.bootcamp.domain.admin.task;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import pl.javastart.bootcamp.utils.ReorderService;
+import pl.javastart.bootcamp.utils.YtLinksParser;
 
 import java.util.List;
 
@@ -23,8 +25,13 @@ public class TaskService {
     }
 
     public void save(Task task) {
+        if (!StringUtils.isEmpty(task.getSolutionVideo())) {
+            List<String> newVideoLinks = YtLinksParser.parseVideoLinks(task.getSolutionVideo().split("\n"));
+            task.setSolutionVideo(String.join("\n", newVideoLinks));
+        }
         taskRepository.save(task);
     }
+
 
     public Task prepareTaskWithSortOrder() {
         Task task = new Task();
