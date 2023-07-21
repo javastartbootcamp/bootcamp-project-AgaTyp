@@ -4,8 +4,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import pl.javastart.bootcamp.domain.user.User;
 import pl.javastart.bootcamp.domain.user.UserService;
+import pl.javastart.bootcamp.domain.user.role.Role;
 
 @Controller
 public class AdminUserController {
@@ -19,6 +22,8 @@ public class AdminUserController {
     @GetMapping("/admin/uzytkownicy")
     public String users(Model model) {
         model.addAttribute("users", userService.findAll());
+//        model.addAttribute("role", Role.ROLE_ADMIN);
+        model.addAttribute("role", Role.ROLE_ADMIN);
         return "admin/users";
     }
 
@@ -29,5 +34,11 @@ public class AdminUserController {
         return "admin/user";
     }
 
+    @PostMapping("/admin/change_role")
+    String changeUserRole(User user) {
+        String email = user.getEmail();
+        userService.changeAdminRoleUserByEmail(email);
+        return "redirect:/admin/uzytkownicy";
+    }
 
 }

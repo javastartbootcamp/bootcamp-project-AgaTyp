@@ -16,12 +16,12 @@ import pl.javastart.bootcamp.mail.MailService;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static pl.javastart.bootcamp.domain.user.ActivationResult.*;
 
 @Service
 public class UserService {
-
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
     private MailService mailService;
@@ -66,6 +66,7 @@ public class UserService {
         user.setActivationCode(UUID.randomUUID().toString());
 
         UserRole userRole = new UserRole();
+        userRole.setUser(user);
         userRole.setRole(Role.ROLE_USER);
         user.setRoles(Collections.singletonList(userRole));
 
@@ -179,5 +180,37 @@ public class UserService {
     public void updateGithubUsername(String name, String githubUsername) {
         User user = findByEmailOrThrow(name);
         user.setGithubUsername(githubUsername);
+    }
+
+    @Transactional
+    public void changeAdminRoleUserByEmail(String email) {
+        Optional<User> user = findByEmail(email);
+        if (isAdmin(email)) {
+            user.ifPresent(u -> {
+                u.getRoles().removeIf(role -> (role.getRole().equals(Role.ROLE_ADMIN)));
+                userRepository.save(u);
+            });
+        } else {
+            user.ifPresent(u -> {
+                UserRole userRole = new UserRole();
+                userRole.setRole(Role.ROLE_ADMIN);
+                userRole.setUser(u);
+                u.getRoles().add(userRole);
+                userRepository.save(u);
+            });
+        }
+    }
+
+    private boolean isAdmin(String email) {
+        return findAllAdminsEmails()
+                .stream()
+                .anyMatch(user -> user.equals(email));
+    }
+
+    private List<String> findAllAdminsEmails() {
+        List<User> allByRolesRole = userRepository.findAllByRoles_Role(Role.ROLE_ADMIN);
+        return allByRolesRole.stream()
+                .map(User::getEmail)
+                .collect(Collectors.toList());
     }
 }
