@@ -41,7 +41,7 @@ public class User {
 
     private LocalDateTime createdDate;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserRole> roles;
 
     @OneToMany(mappedBy = "user")

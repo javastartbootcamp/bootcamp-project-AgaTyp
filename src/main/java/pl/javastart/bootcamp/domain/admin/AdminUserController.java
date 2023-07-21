@@ -34,18 +34,11 @@ public class AdminUserController {
         return "admin/user";
     }
 
-//    @GetMapping("/admin/change_role")
-//    String changeUserRole(@RequestParam String email) {
-//        userService.changeAdminRoleUserByEmail(email);
-//        return "redirect:/admin/uzytkownicy";
-//    }
-
     @PostMapping("/admin/change_role")
     String changeUserRole(User user) {
         String email = user.getEmail();
         userService.changeAdminRoleUserByEmail(email);
         return "redirect:/admin/uzytkownicy";
     }
-
 
 }

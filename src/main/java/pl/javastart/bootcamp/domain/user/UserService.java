@@ -66,6 +66,7 @@ public class UserService {
         user.setActivationCode(UUID.randomUUID().toString());
 
         UserRole userRole = new UserRole();
+        userRole.setUser(user);
         userRole.setRole(Role.ROLE_USER);
         user.setRoles(Collections.singletonList(userRole));
 

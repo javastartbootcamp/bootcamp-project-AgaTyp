@@ -20,6 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByPasswordResetKey(String key);
 
-    List<User> findAllByRoles_Role(Role roles_role);
+    List<User> findAllByRoles_Role(Role role);
 
 }
