@@ -20,6 +20,7 @@ public class UserRole {
     public UserRole() {
 
     }
+    
     public UserRole(User user, Role role) {
         this.user = user;
         this.role = role;
